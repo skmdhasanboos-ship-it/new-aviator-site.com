@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator Pro - Admin Control Version</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --aviator-red: #d11d33;
+            --bg-dark: #121314;
+            --panel-bg: #1b1c1d;
+            --btn-green: linear-gradient(180deg, #28a745 0%, #1e7e34 100%);
+            --btn-yellow: linear-gradient(180deg, #ffc107 0%, #e0a800 100%);
+            --ref-green: #00ff88;
+        }
+
+        body { margin: 0; background: var(--bg-dark); font-family: 'Roboto', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+
+        .history-bar {
+            width: 100%; background: #141516; padding: 6px 10px;
+            display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid #333;
+            min-height: 35px; align-items: center; white-space: nowrap; scrollbar-width: none;
+        }
+        .history-bar::-webkit-scrollbar { display: none; }
+        .hist-item {
+            font-size: 11px; font-weight: bold; padding: 3px 12px;
+            border-radius: 15px; background: #222; color: #34b4ff; border: 1px solid #333;
+        }
+        .hist-high { color: #913ef8; }
+
+        .header { 
+            width: 100%; padding: 10px 15px; 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; 
+            align-items: center; background: #1b1c1d; 
+            border-bottom: 1px solid #333; box-sizing: border-box; 
+        }
+        .menu-btn { background: none; border: none; color: #ccc; font-size: 24px; cursor: pointer; justify-self: start; }
+        .brand-name { color: var(--aviator-red); font-weight: 900; font-style: italic; font-size: 20px; text-align: center; }
+        .balance-box { color: #00ff88; font-weight: bold; background: #000; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; font-size: 13px; justify-self: end; }
+
+        .display-card { width: 95%; max-width: 450px; height: 210px; background: radial-gradient(circle, #2c2d30 0%, #000 100%); border-radius: 12px; position: relative; margin: 10px 0; overflow: hidden; border: 1px solid #333; }
+        #plane { position: absolute; bottom: 20px; left: -100px; width: 65px; z-index: 10; }
+        .multiplier { position: absolute; width: 100%; top: 35%; text-align: center; font-size: 55px; font-weight: 900; z-index: 5; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
+        .modal-content { background: #1b1c1d; margin: 5% auto; padding: 20px; width: 90%; max-width: 450px; border-radius: 15px; border: 1px solid var(--aviator-red); text-align: center; }
+        .modal input, .modal select { width: 90%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: #00ff88; border-radius: 5px; }
+        .modal button { background: var(--aviator-red); border: none; color: white; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .close-modal { float: right; cursor: pointer; font-size: 24px; color: #888; }
+
+        /* Referral Design */
+        .ref-container { background: #1b1c1d; border: 2px dashed var(--ref-green); border-radius: 12px; padding: 15px; text-align: left; margin: 20px 0; }
+        .ref-header { display: flex; align-items: center; gap: 8px; color: var(--ref-green); font-weight: bold; font-size: 14px; margin-bottom: 8px; }
+        .ref-link-display { font-size: 10px; color: #888; word-break: break-all; display: block; margin-bottom: 12px; line-height: 1.4; }
+        .copy-ref-btn { background: var(--ref-green) !important; color: black !important; font-weight: 900 !important; border-radius: 5px !important; padding: 10px !important; font-size: 14px !important; letter-spacing: 0.5px; }
+
+        .bet-container { width: 95%; max-width: 450px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
+        .bet-panel { background: var(--panel-bg); border-radius: 15px; padding: 12px; border: 1px solid #333; }
+        .tab-row { display: flex; background: #000; border-radius: 20px; padding: 2px; width: 120px; margin: 0 auto 12px; }
+        .tab { flex:1; text-align:center; font-size:11px; padding:5px; border-radius:20px; cursor:pointer; color:#888; }
+        .tab.active { background:#323336; color:white; }
+        .auto-section { display: none; margin-bottom: 12px; padding: 10px; background: #141516; border-radius: 10px; }
+        .auto-section.active { display: block; }
+        .auto-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
+        .switch { position: relative; width: 36px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #444; transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background: #28a745; }
+        input:checked + .slider:before { transform: translateX(16px); }
+        .main-controls { display: flex; gap: 12px; align-items: center; }
+        .plus-minus { display: flex; align-items: center; background: #000; border-radius: 25px; border: 1px solid #444; padding: 3px 10px; flex: 1; }
+        .plus-minus input { background: transparent; border: none; color: white; text-align: center; width: 100%; font-weight: bold; outline: none; font-size: 16px; }
+        .plus-minus button { background: #333; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
+        .quick-bet-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .quick-btn { background: #222; border: 1px solid #333; color: #ccc; padding: 5px; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .quick-btn:hover { background: #333; }
+        .btn-main { flex: 1.3; height: 75px; border-radius: 15px; border: none; color: white; font-weight: 800; background: var(--btn-green); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-main span { font-size: 16px; display: block; }
+        .btn-main.cashout-active { background: var(--btn-yellow) !important; color: black !important; }
+        .btn-main.waiting-mode { background: #444 !important; color: #aaa !important; cursor: default; }
+        .copy-box { background: #000; padding: 10px; border-radius: 5px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        .copy-btn { background: #333; color: #00ff88; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .req-card { background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: left; font-size: 13px; color: #fff; }
+        .req-btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .approve-btn { background: #28a745 !important; flex: 1; height: 35px; }
+        .cancel-btn { background: #d11d33 !important; flex: 1; height: 35px; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        .history-table th, .history-table td { border: 1px solid #333; padding: 8px; text-align: center; }
+        .status-Approved { color: #00ff88; }
+        .status-Pending { color: #ffc107; }
+        .status-Cancelled { color: #ff4444; }
+        .side-menu { position: fixed; top: 0; left: -260px; width: 260px; height: 100%; background: #111; z-index: 1000; transition: 0.3s; padding: 20px; box-sizing: border-box; }
+        .side-menu.active { left: 0; }
+        .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 999; }
+        .menu-overlay.active { display: block; }
+        .menu-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body onload="init()">
+
+    <div class="history-bar" id="history-signals"></div>
+
+    <div class="header">
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="brand-name">Aviator</div>
+        <div class="balance-box">৳ <span id="balance">0.00</span></div>
+    </div>
+
+    <div class="display-card">
+        <div class="multiplier" id="mult-text">1.00x</div>
+        <img src="https://files.catbox.moe/ivtc82.png" id="plane" alt="Plane">
+    </div>
+
+    <div id="depModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h3 style="color:var(--aviator-red); margin-bottom: 5px;">DEPOSIT</h3>
+            <p style="color: #28a745; font-weight: bold; font-size: 14px; margin: 0 0 10px 0;">💸 30% Deposit Bonus 💸</p>
+            <p style="font-size: 12px; color: #888;">Min Deposit: ৳80</p>
+            <div class="copy-box"><span>Bkash: 01933098049</span><button class="copy-btn" onclick="copyText('01933098049')">COPY</button></div>
+            <div class="copy-box"><span>Nagad: 01765943426</span><button class="copy-btn" onclick="copyText('01765943426')">COPY</button></div>
+            <input type="number" id="depAmt" placeholder="Amount (Min 80)">
+            <input type="text" id="trxId" placeholder="TrxID">
+            <button onclick="submitDeposit()">SUBMIT REQUEST</button>
+            <h4 style="margin-top:20px; border-top: 1px solid #333; padding-top:10px;">Deposit History</h4>
+            <div id="depHistoryList"></div>
+        </div>
+    </div>
+
+    <div id="withModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h3 style="color:var(--aviator-red)">WITHDRAW</h3>
+            <p style="font-size: 12px; color: #888;">Min Withdraw: ৳100</p>
+            <select id="withMethod"><option value="Bkash">Bkash</option><option value="Nagad">Nagad</option></select>
+            <input type="number" id="withAmt" placeholder="Amount (Min 100)">
+            <input type="text" id="withNum" placeholder="Account Number">
+            <button onclick="submitWithdraw()">SUBMIT REQUEST</button>
+            <h4 style="margin-top:20px; border-top: 1px solid #333; padding-top:10px;">Withdraw History</h4>
+            <div id="withHistoryList"></div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h3 style="color:var(--aviator-red)">ADMIN PANEL</h3>
+            <div id="adminLogin">
+                <input type="password" id="adminPass" placeholder="Password">
+                <button onclick="checkAdmin()">LOGIN</button>
+            </div>
+            <div id="adminDashboard" style="display:none">
+                <h4 style="border-bottom:1px solid #333; padding-bottom:5px">Pending Requests</h4>
+                <div id="requestList"></div>
+                <button style="background:#555" onclick="clearAllData()">Reset All Data</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="refModal" class="modal">
+        <div class="modal-content" style="border:none; text-align: left; background: transparent;">
+            <span class="close-modal" onclick="closeModals()" style="color:white; float:right;">&times;</span>
+            <h1 style="color:var(--ref-green); font-size: 38px; margin: 0; font-weight: 900;">Menu</h1>
+            
+            <div class="ref-container">
+                <div class="ref-header">
+                    <span>🔗</span>
+                    <span>Referral Link (5% Bonus)</span>
+                </div>
+                <span id="refLink" class="ref-link-display"></span>
+                <button class="copy-ref-btn" onclick="copyText(document.getElementById('refLink').innerText)">
+                    COPY REFERRAL LINK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bet-container">
+        <div class="bet-panel" id="panel1">
+            <div class="tab-row">
+                <div class="tab active" onclick="setTab(1, 'bet')">Bet</div>
+                <div class="tab" onclick="setTab(1, 'auto')">Auto</div>
+            </div>
+            <div class="auto-section" id="auto1">
+                <div class="auto-row"><span>Auto Bet</span><label class="switch"><input type="checkbox" id="ab1"><span class="slider"></span></label></div>
+                <div class="auto-row"><span>Auto Cashout</span><label class="switch"><input type="checkbox" id="ac1"><span class="slider"></span></label><input type="number" id="acv1" value="2.00" step="0.1" style="width:45px; background:#000; border:1px solid #444; text-align:center; color:#00ff88;"></div>
+            </div>
+            <div class="main-controls">
+                <div style="flex:1">
+                    <div class="plus-minus"><button onclick="chAmt(1, -10)">-</button><input type="number" id="amt1" value="10.00"><button onclick="chAmt(1, 10)">+</button></div>
+                    <div class="quick-bet-row">
+                        <button class="quick-btn" onclick="setFixedAmt(1, 30)">30</button>
+                        <button class="quick-btn" onclick="setFixedAmt(1, 50)">50</button>
+                        <button class="quick-btn" onclick="setFixedAmt(1, 100)">100</button>
+                        <button class="quick-btn" onclick="setFixedAmt(1, 200)">200</button>
+                    </div>
+                </div>
+                <button class="btn-main" id="btn1" onclick="handleBet(1)">BET <span>10.00 BDT</span></button>
+            </div>
+        </div>
+
+        <div class="bet-panel" id="panel2">
+            <div class="tab-row">
+                <div class="tab active" onclick="setTab(2, 'bet')">Bet</div>
+                <div class="tab" onclick="setTab(2, 'auto')">Auto</div>
+            </div>
+            <div class="auto-section" id="auto2">
+                <div class="auto-row"><span>Auto Bet</span><label class="switch"><input type="checkbox" id="ab2"><span class="slider"></span></label></div>
+                <div class="auto-row"><span>Auto Cashout</span><label class="switch"><input type="checkbox" id="ac2"><span class="slider"></span></label><input type="number" id="acv2" value="2.00" step="0.1" style="width:45px; background:#000; border:1px solid #444; text-align:center; color:#00ff88;"></div>
+            </div>
+            <div class="main-controls">
+                <div style="flex:1">
+                    <div class="plus-minus"><button onclick="chAmt(2, -10)">-</button><input type="number" id="amt2" value="10.00"><button onclick="chAmt(2, 10)">+</button></div>
+                    <div class="quick-bet-row">
+                        <button class="quick-btn" onclick="setFixedAmt(2, 30)">30</button>
+                        <button class="quick-btn" onclick="setFixedAmt(2, 50)">50</button>
+                        <button class="quick-btn" onclick="setFixedAmt(2, 100)">100</button>
+                        <button class="quick-btn" onclick="setFixedAmt(2, 200)">200</button>
+                    </div>
+                </div>
+                <button class="btn-main" id="btn2" onclick="handleBet(2)">BET <span>10.00 BDT</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="side-menu" id="sideMenu">
+        <h2 style="color:var(--aviator-red)">MENU</h2>
+        <div class="menu-item" onclick="openModal('depModal')">💰 Deposit</div>
+        <div class="menu-item" onclick="openModal('withModal')">🏧 Withdraw</div>
+        <div class="menu-item" onclick="openModal('refModal')">🔗 Referral</div>
+        <div class="menu-item" onclick="openModal('adminModal')">🛠 Admin Panel</div>
+        <div class="menu-item" onclick="location.reload()">🔄 Refresh Game</div>
+    </div>
+
+<script>
+    // Security: Encoded Admin Password and storage keys
+    const _0xkey1 = "YXZpX2JhbA=="; // avi_bal
+    const _0xkey2 = "YXZpX3JlcXM="; // avi_reqs
+    const _0xadm = "aGFzYW5qY2QwMzc1"; // aGFzYW5qY2QwMzc1 (Encoded)
+
+    function _d(s){return atob(s);}
+
+    let balance = parseFloat(localStorage.getItem(_d(_0xkey1))) || 0.00;
+    let requests = JSON.parse(localStorage.getItem(_d(_0xkey2))) || [];
+    let isFlying = false;
+    let multiplier = 1.00;
+    let crashPoint = 0;
+    let bets = { 1: { active: false, waiting: false, amt: 0 }, 2: { active: false, waiting: false, amt: 0 } };
+
+    // Anti-Inspect: Disable Right Click & Keys
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function(e) {
+        if (e.keyCode == 123 || (e.ctrlKey && (e.shiftKey && e.keyCode == 73)) || (e.ctrlKey && e.keyCode == 85)) {
+            return false;
+        }
+    };
+
+    function init() { 
+        refreshUI(); 
+        startCycle(); 
+        let currentPath = window.location.href.split('?')[0];
+        document.getElementById('refLink').innerText = currentPath + "?ref=REF" + (Math.floor(Math.random() * 8000) + 1000);
+    }
+
+    function saveData() {
+        localStorage.setItem(_d(_0xkey1), balance);
+        localStorage.setItem(_d(_0xkey2), JSON.stringify(requests));
+    }
+    
+    function refreshUI() { 
+        document.getElementById('balance').innerText = balance.toFixed(2); 
+        renderAdminRequests();
+        renderUserHistory();
+        saveData();
+    }
+
+    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
+    function openModal(id) { toggleMenu(); document.getElementById(id).style.display = "block"; refreshUI(); }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
+    function copyText(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
+
+    function checkAdmin() {
+        // Checking against decoded password
+        if(document.getElementById('adminPass').value === _d(_0xadm)) {
+            document.getElementById('adminLogin').style.display = "none";
+            document.getElementById('adminDashboard').style.display = "block";
+            renderAdminRequests();
+        } else { alert("Access Denied!"); }
+    }
+
+    function submitDeposit() {
+        let amt = parseFloat(document.getElementById('depAmt').value);
+        let trx = document.getElementById('trxId').value;
+        if(amt >= 80 && trx) {
+            requests.push({ id: Date.now(), type: 'DEP', amt: amt, info: trx, method: 'TrxID', status: 'Pending' });
+            alert("Sent! Wait for Approval.");
+            refreshUI();
+        } else { alert("Min Deposit is 80 BDT!"); }
+    }
+
+    function submitWithdraw() {
+        let amt = parseFloat(document.getElementById('withAmt').value);
+        let num = document.getElementById('withNum').value;
+        let method = document.getElementById('withMethod').value;
+        if(amt >= 100 && num && balance >= amt) {
+            balance -= amt;
+            requests.push({ id: Date.now(), type: 'WITH', amt: amt, info: num, method: method, status: 'Pending' });
+            alert("Request Sent!");
+            refreshUI();
+        } else { alert("Min Withdraw 100 or Insufficient Balance!"); }
+    }
+
+    function renderAdminRequests() {
+        let list = document.getElementById('requestList');
+        if(!list) return;
+        list.innerHTML = "";
+        let pending = requests.filter(r => r.status === 'Pending');
+        if(pending.length === 0) { list.innerHTML = "<p>No Pending Requests</p>"; return; }
+        
+        pending.forEach(req => {
+            let div = document.createElement('div');
+            div.className = "req-card";
+            div.innerHTML = `
+                <b>${req.type === 'DEP' ? 'DEPOSIT' : 'WITHDRAW'} (${req.method})</b><br>
+                Amount: ${req.amt} BDT<br>
+                Detail: ${req.info}
+                <div class="req-btn-group">
+                    <button class="approve-btn" onclick="manageReq(${req.id}, 'Approve')">Approve</button>
+                    <button class="cancel-btn" onclick="manageReq(${req.id}, 'Cancel')">Cancel</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function renderUserHistory() {
+        let depList = document.getElementById('depHistoryList');
+        let withList = document.getElementById('withHistoryList');
+        if(!depList || !withList) return;
+        let depHTML = `<table class="history-table"><tr><th>Amt</th><th>Info</th><th>Status</th></tr>`;
+        let withHTML = `<table class="history-table"><tr><th>Amt</th><th>Method</th><th>Status</th></tr>`;
+        requests.slice().reverse().forEach(req => {
+            if(req.type === 'DEP') {
+                depHTML += `<tr><td>${req.amt}</td><td>${req.info}</td><td class="status-${req.status}">${req.status}</td></tr>`;
+            } else {
+                withHTML += `<tr><td>${req.amt}</td><td>${req.method}</td><td class="status-${req.status}">${req.status}</td></tr>`;
+            }
+        });
+        depList.innerHTML = depHTML + `</table>`;
+        withList.innerHTML = withHTML + `</table>`;
+    }
+
+    function manageReq(id, action) {
+        let reqIndex = requests.findIndex(r => r.id === id);
+        let req = requests[reqIndex];
+        if(action === 'Approve') {
+            if(req.type === 'DEP') balance += (req.amt + (req.amt * 0.30));
+            requests[reqIndex].status = 'Approved';
+            alert("Approved!");
+        } else {
+            if(req.type === 'WITH') balance += req.amt;
+            requests[reqIndex].status = 'Cancelled';
+            alert("Cancelled!");
+        }
+        refreshUI();
+    }
+
+    function clearAllData() { localStorage.clear(); location.reload(); }
+
+    function setTab(p, mode) {
+        document.getElementById('auto'+p).classList.toggle('active', mode === 'auto');
+        let tabs = document.getElementById('panel'+p).querySelectorAll('.tab');
+        tabs[0].classList.toggle('active', mode === 'bet'); tabs[1].classList.toggle('active', mode === 'auto');
+    }
+
+    function startCycle() {
+        isFlying = false; multiplier = 1.00;
+        crashPoint = (Math.random() * 3.5 + 1.02).toFixed(2);
+        let timeLeft = 5; 
+        document.getElementById('mult-text').style.color = "#00ff88"; 
+        document.getElementById('plane').style.left = "-100px";
+        for(let i=1; i<=2; i++) {
+            if(document.getElementById('ab'+i).checked && !bets[i].active && !bets[i].waiting) {
+                let v = parseFloat(document.getElementById('amt'+i).value);
+                if(balance >= v) { balance -= v; bets[i].amt = v; bets[i].active = true; }
+            }
+            if(bets[i].waiting) { bets[i].active = true; bets[i].waiting = false; }
+            refreshBtn(i);
+        }
+        refreshUI();
+        let countdown = setInterval(() => {
+            if(timeLeft > 0) {
+                document.getElementById('mult-text').innerText = timeLeft;
+                timeLeft--;
+            } else {
+                clearInterval(countdown);
+                launch();
+            }
+        }, 1000);
+    }
+
+    function launch() {
+        isFlying = true;
+        document.getElementById('mult-text').style.color = "white";
+        let loop = setInterval(() => {
+            multiplier += 0.01;
+            document.getElementById('mult-text').innerText = multiplier.toFixed(2) + "x";
+            document.getElementById('plane').style.left = (multiplier * 22) + "px";
+            for(let i=1; i<=2; i++) {
+                if(bets[i].active) {
+                    document.getElementById('btn'+i).className = "btn-main cashout-active";
+                    document.getElementById('btn'+i).innerHTML = `CASHOUT <span>${(bets[i].amt * multiplier).toFixed(2)}</span>`;
+                    if(document.getElementById('ac'+i).checked && multiplier >= parseFloat(document.getElementById('acv'+i).value)) doCash(i);
+                }
+            }
+            if(multiplier >= crashPoint) {
+                clearInterval(loop); isFlying = false;
+                addHistory(multiplier.toFixed(2));
+                document.getElementById('mult-text').innerText = "FLEW AWAY!";
+                document.getElementById('mult-text').style.color = "red";
+                for(let i=1; i<=2; i++) { bets[i].active = false; refreshBtn(i); }
+                setTimeout(startCycle, 3000);
+            }
+        }, 50);
+    }
+
+    function addHistory(v) {
+        let h = document.getElementById('history-signals');
+        let cls = v >= 2 ? 'hist-high' : '';
+        h.innerHTML = `<div class="hist-item ${cls}">${v}x</div>` + h.innerHTML;
+    }
+
+    function handleBet(p) {
+        let v = parseFloat(document.getElementById('amt'+p).value);
+        if(!isFlying) {
+            if(!bets[p].active) { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].active = true; } }
+            else { balance += bets[p].amt; bets[p].active = false; }
+        } else {
+            if(bets[p].active) doCash(p);
+            else if(!bets[p].waiting) { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].waiting = true; } }
+        }
+        refreshBtn(p); refreshUI();
+    }
+
+    function doCash(p) {
+        if(!bets[p].active) return;
+        balance += (bets[p].amt * multiplier);
+        bets[p].active = false;
+        refreshBtn(p); refreshUI();
+    }
+
+    function refreshBtn(p) {
+        let b = document.getElementById('btn'+p);
+        let v = document.getElementById('amt'+p).value;
+        if(bets[p].waiting) { b.className="btn-main waiting-mode"; b.innerHTML="WAITING..."; }
+        else if(bets[p].active && !isFlying) { b.className="btn-main waiting-mode"; b.innerHTML="CANCEL"; }
+        else if(!bets[p].active) { b.className="btn-main"; b.innerHTML=`BET <span>${v} BDT</span>`; }
+    }
+
+    function chAmt(p, v) { 
+        let i = document.getElementById('amt'+p);
+        i.value = Math.max(1, parseFloat(i.value) + v).toFixed(2);
+        refreshBtn(p);
+    }
+
+    function setFixedAmt(p, v) {
+        if(bets[p].active || bets[p].waiting) return; 
+        document.getElementById('amt'+p).value = v.toFixed(2);
+        refreshBtn(p);
+    }
+</script>
+</body>
+</html>
