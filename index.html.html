@@ -286,41 +286,18 @@
         <div class="menu-item" onclick="handleLogout()">🚪 Logout</div>
     </div>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <script>
-    // --- Draggable Helpline Script ---
-    const dragBtn = document.getElementById("helplineBtn");
-    let isDragging = false;
-    let offset = { x: 0, y: 0 };
+    // --- Firebase Initialization ---
+    const firebaseConfig = {
+        databaseURL: "https://aviatorpro-e7334-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    function startDrag(e) {
-        isDragging = true;
-        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-        offset.x = clientX - dragBtn.offsetLeft;
-        offset.y = clientY - dragBtn.offsetTop;
-    }
-
-    function doDrag(e) {
-        if (!isDragging) return;
-        e.preventDefault();
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-        dragBtn.style.left = (clientX - offset.x) + 'px';
-        dragBtn.style.top = (clientY - offset.y) + 'px';
-        dragBtn.style.right = 'auto';
-        dragBtn.style.bottom = 'auto';
-    }
-
-    function stopDrag() { isDragging = false; }
-
-    dragBtn.addEventListener('mousedown', startDrag);
-    dragBtn.addEventListener('touchstart', startDrag);
-    window.addEventListener('mousemove', doDrag);
-    window.addEventListener('touchmove', doDrag, { passive: false });
-    window.addEventListener('mouseup', stopDrag);
-    window.addEventListener('touchend', stopDrag);
-
-    // --- Original Script Logic ---
+    // --- Original Script Logic Re-integrated ---
     const _0xkey1 = "YXZpX2JhbA=="; 
     const _0xkey2 = "YXZpX3JlcXM="; 
     const _0xadm = "aGFzYW5qY2QwMzc1"; 
@@ -329,6 +306,25 @@
     const _0xses = "YXZpX3Nlc3Npb24="; 
 
     function _d(s){return atob(s);}
+
+    // Draggable Helpline
+    const dragBtn = document.getElementById("helplineBtn");
+    let isDragging = false;
+    let offset = { x: 0, y: 0 };
+    function startDrag(e) { isDragging = true; const clX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX; const clY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY; offset.x = clX - dragBtn.offsetLeft; offset.y = clY - dragBtn.offsetTop; }
+    function doDrag(e) { if (!isDragging) return; e.preventDefault(); const clX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX; const clY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY; dragBtn.style.left = (clX - offset.x) + 'px'; dragBtn.style.top = (clY - offset.y) + 'px'; dragBtn.style.right = 'auto'; dragBtn.style.bottom = 'auto'; }
+    function stopDrag() { isDragging = false; }
+    dragBtn.addEventListener('mousedown', startDrag); dragBtn.addEventListener('touchstart', startDrag);
+    window.addEventListener('mousemove', doDrag); window.addEventListener('touchmove', doDrag, { passive: false });
+    window.addEventListener('mouseup', stopDrag); window.addEventListener('touchend', stopDrag);
+
+    // Auth & Game Variables
+    let balance = parseFloat(localStorage.getItem(_d(_0xkey1))) || 0.00;
+    let gameHistory = JSON.parse(localStorage.getItem(_d(_0xhist))) || [];
+    let isFlying = false;
+    let multiplier = 1.00;
+    let crashPoint = 0;
+    let bets = { 1: { active: false, waiting: false, amt: 0 }, 2: { active: false, waiting: false, amt: 0 } };
 
     function toggleAuth(isLogin) {
         document.getElementById('loginBox').style.display = isLogin ? 'block' : 'none';
@@ -342,11 +338,9 @@
         let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
         if(ph.length < 10 || ps.length < 4) return alert("Invalid Details!");
         if(ps !== cp) return alert("Passwords don't match!");
-        if(users.find(u => u.ph === ph)) return alert("User already exists with this number!");
         users.push({ ph: ph, ps: ps });
         localStorage.setItem(_d(_0xusr), JSON.stringify(users));
         localStorage.setItem(_d(_0xses), ph);
-        alert("Registration Successful!");
         location.reload();
     }
 
@@ -356,115 +350,119 @@
         let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
         let user = users.find(u => u.ph === ph && u.ps === ps);
         if(user) { localStorage.setItem(_d(_0xses), ph); location.reload(); }
-        else { alert("Wrong Phone or Password!"); }
+        else alert("Wrong Phone or Password!");
     }
 
     function handleLogout() { localStorage.removeItem(_d(_0xses)); location.reload(); }
 
-    let balance = parseFloat(localStorage.getItem(_d(_0xkey1))) || 0.00;
-    let requests = JSON.parse(localStorage.getItem(_d(_0xkey2))) || [];
-    let gameHistory = JSON.parse(localStorage.getItem(_d(_0xhist))) || [];
-    let totalRefers = parseInt(localStorage.getItem('avi_total_ref')) || 0;
-    let totalBonus = parseFloat(localStorage.getItem('avi_total_bonus')) || 0.00;
-
-    let isFlying = false;
-    let multiplier = 1.00;
-    let crashPoint = 0;
-    let bets = { 1: { active: false, waiting: false, amt: 0 }, 2: { active: false, waiting: false, amt: 0 } };
-
     function init() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const refCode = urlParams.get('ref');
-        if (refCode) { toggleAuth(false); document.getElementById('regRef').value = refCode; }
-        if(localStorage.getItem(_d(_0xses))) { document.getElementById('authOverlay').style.display = 'none'; }
+        if(localStorage.getItem(_d(_0xses))) document.getElementById('authOverlay').style.display = 'none';
         refreshUI(); renderSavedHistory(); startCycle();
         document.getElementById('refLink').innerText = window.location.origin + window.location.pathname + "?ref=REF" + Math.floor(Math.random()*9999);
     }
 
     function saveData() {
         localStorage.setItem(_d(_0xkey1), balance);
-        localStorage.setItem(_d(_0xkey2), JSON.stringify(requests));
         localStorage.setItem(_d(_0xhist), JSON.stringify(gameHistory));
-        localStorage.setItem('avi_total_ref', totalRefers);
-        localStorage.setItem('avi_total_bonus', totalBonus.toFixed(2));
     }
     
     function refreshUI() { 
         document.getElementById('balance').innerText = balance.toFixed(2); 
-        renderAdminRequests(); renderUserHistory(); saveData();
+        saveData();
+        renderUserHistory(); 
     }
 
-    function updateDepNumbers() {
-        const method = document.getElementById('depMethod').value;
-        document.getElementById('activeDepNum').innerText = method === "Bkash" ? "Bkash: 01933098049" : "Nagad: 01765943426";
-    }
-    function copyDepNumber() { copyText(document.getElementById('activeDepNum').innerText.split(': ')[1]); }
-    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
-    function openModal(id) { toggleMenu(); document.getElementById(id).style.display = "block"; refreshUI(); }
-    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
-    function copyText(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
-
-    function checkAdmin() {
-        if(document.getElementById('adminPass').value === _d(_0xadm)) {
-            document.getElementById('adminLogin').style.display = "none";
-            document.getElementById('adminDashboard').style.display = "block";
-            renderAdminRequests();
-        } else alert("Denied!");
-    }
-
+    // --- Firebase Functions for Requests ---
     function submitDeposit() {
         let amt = parseFloat(document.getElementById('depAmt').value);
         let trx = document.getElementById('trxId').value;
+        let userPh = localStorage.getItem(_d(_0xses)) || "Unknown";
         if(amt >= 80 && trx) {
-            requests.push({ id: Date.now(), type: 'DEP', amt: amt, info: trx, method: document.getElementById('depMethod').value, status: 'Pending' });
-            alert("Request Sent!"); refreshUI();
+            let id = Date.now();
+            db.ref('requests/' + id).set({
+                id: id, type: 'DEP', amt: amt, info: trx, 
+                method: document.getElementById('depMethod').value, 
+                status: 'Pending', user: userPh
+            }).then(() => { alert("Deposit Request Sent!"); closeModals(); });
         }
     }
 
     function submitWithdraw() {
         let amt = parseFloat(document.getElementById('withAmt').value);
         let num = document.getElementById('withNum').value;
+        let userPh = localStorage.getItem(_d(_0xses)) || "Unknown";
         if(amt >= 100 && num && balance >= amt) {
-            balance -= amt;
-            requests.push({ id: Date.now(), type: 'WITH', amt: amt, info: num, method: document.getElementById('withMethod').value, status: 'Pending' });
-            alert("Request Sent!"); refreshUI();
-        }
+            let id = Date.now();
+            db.ref('requests/' + id).set({
+                id: id, type: 'WITH', amt: amt, info: num, 
+                method: document.getElementById('withMethod').value, 
+                status: 'Pending', user: userPh
+            }).then(() => {
+                balance -= amt; refreshUI();
+                alert("Withdraw Request Sent!"); closeModals();
+            });
+        } else alert("Insufficient Balance!");
     }
 
     function renderAdminRequests() {
         let list = document.getElementById('requestList'); if(!list) return;
-        list.innerHTML = "";
-        requests.filter(r => r.status === 'Pending').forEach(req => {
-            let div = document.createElement('div'); div.className = "req-card";
-            div.innerHTML = `<b>${req.type}</b> (${req.method})<br>Amt: ${req.amt}<br>Info: ${req.info}<div class="req-btn-group"><button class="approve-btn" onclick="manageReq(${req.id}, 'Approve')">Approve</button><button class="cancel-btn" onclick="manageReq(${req.id}, 'Cancel')">Cancel</button></div>`;
-            list.appendChild(div);
+        db.ref('requests').on('value', (snap) => {
+            list.innerHTML = "";
+            let data = snap.val();
+            for(let key in data) {
+                let req = data[key];
+                if(req.status === 'Pending') {
+                    let div = document.createElement('div'); div.className = "req-card";
+                    div.innerHTML = `<b>${req.type}</b> (${req.user})<br>Amt: ${req.amt}<br>Trx/Num: ${req.info}
+                    <div class="req-btn-group">
+                        <button class="approve-btn" onclick="manageFirebaseReq('${key}', 'Approve')">Approve</button>
+                        <button class="cancel-btn" onclick="manageFirebaseReq('${key}', 'Cancel')">Cancel</button>
+                    </div>`;
+                    list.appendChild(div);
+                }
+            }
+        });
+    }
+
+    function manageFirebaseReq(key, action) {
+        db.ref('requests/' + key).once('value').then((snap) => {
+            let r = snap.val();
+            if(action === 'Approve') {
+                // Note: Balance is local, you may need to handle user-specific balance in DB for full automation
+                db.ref('requests/' + key).update({ status: 'Approved' });
+            } else {
+                db.ref('requests/' + key).update({ status: 'Cancelled' });
+            }
         });
     }
 
     function renderUserHistory() {
         let dH = document.getElementById('depHistoryList'); let wH = document.getElementById('withHistoryList');
         if(!dH || !wH) return;
-        let buildTable = (type) => {
-            let html = `<table class="history-table"><tr><th>Amt</th><th>Info</th><th>Status</th></tr>`;
-            requests.filter(r => r.type === type).reverse().forEach(r => {
-                html += `<tr><td>${r.amt}</td><td>${r.info}</td><td class="status-${r.status}">${r.status}</td></tr>`;
-            });
-            return html + `</table>`;
-        };
-        dH.innerHTML = buildTable('DEP'); wH.innerHTML = buildTable('WITH');
+        let userPh = localStorage.getItem(_d(_0xses));
+        db.ref('requests').on('value', (snap) => {
+            let data = snap.val();
+            let dTable = `<table class="history-table"><tr><th>Amt</th><th>Info</th><th>Status</th></tr>`;
+            let wTable = dTable;
+            for(let key in data) {
+                let r = data[key];
+                if(r.user === userPh) {
+                    let row = `<tr><td>${r.amt}</td><td>${r.info}</td><td class="status-${r.status}">${r.status}</td></tr>`;
+                    if(r.type === 'DEP') dTable += row; else wTable += row;
+                }
+            }
+            dH.innerHTML = dTable + "</table>"; wH.innerHTML = wTable + "</table>";
+        });
     }
 
-    function manageReq(id, action) {
-        let r = requests.find(x => x.id === id);
-        if(action === 'Approve') {
-            if(r.type === 'DEP') balance += (r.amt * 1.3);
-            r.status = 'Approved';
-        } else {
-            if(r.type === 'WITH') balance += r.amt;
-            r.status = 'Cancelled';
-        }
-        refreshUI();
-    }
+    // --- Game Engine (Original) ---
+    function updateDepNumbers() { const m = document.getElementById('depMethod').value; document.getElementById('activeDepNum').innerText = m === "Bkash" ? "Bkash: 01933098049" : "Nagad: 01765943426"; }
+    function copyDepNumber() { copyText(document.getElementById('activeDepNum').innerText.split(': ')[1]); }
+    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
+    function openModal(id) { toggleMenu(); document.getElementById(id).style.display = "block"; if(id==='adminModal') renderAdminRequests(); }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
+    function copyText(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
+    function checkAdmin() { if(document.getElementById('adminPass').value === _d(_0xadm)) { document.getElementById('adminLogin').style.display = "none"; document.getElementById('adminDashboard').style.display = "block"; renderAdminRequests(); } else alert("Denied!"); }
 
     function startCycle() {
         isFlying = false; multiplier = 1.00;
@@ -472,17 +470,13 @@
         let t = 5; document.getElementById('plane').style.left = "-100px";
         for(let i=1;i<=2;i++) {
             if(document.getElementById('ab'+i).checked && balance >= parseFloat(document.getElementById('amt'+i).value)) {
-                let v = parseFloat(document.getElementById('amt'+i).value);
-                balance -= v; bets[i].amt = v; bets[i].active = true;
+                let v = parseFloat(document.getElementById('amt'+i).value); balance -= v; bets[i].amt = v; bets[i].active = true;
             }
             if(bets[i].waiting) { bets[i].active = true; bets[i].waiting = false; }
             refreshBtn(i);
         }
         refreshUI();
-        let cd = setInterval(() => {
-            if(t > 0) document.getElementById('mult-text').innerText = t--;
-            else { clearInterval(cd); launch(); }
-        }, 1000);
+        let cd = setInterval(() => { if(t > 0) document.getElementById('mult-text').innerText = t--; else { clearInterval(cd); launch(); } }, 1000);
     }
 
     function launch() {
@@ -499,8 +493,7 @@
                 }
             }
             if(multiplier >= crashPoint) {
-                clearInterval(loop); isFlying = false;
-                addHistory(multiplier.toFixed(2));
+                clearInterval(loop); isFlying = false; addHistory(multiplier.toFixed(2));
                 document.getElementById('mult-text').innerText = "FLEW AWAY!";
                 for(let i=1; i<=2; i++) { bets[i].active = false; refreshBtn(i); }
                 setTimeout(startCycle, 3000);
@@ -508,37 +501,20 @@
         }, 50);
     }
 
-    function addHistory(v) {
-        gameHistory.unshift(v); if(gameHistory.length > 20) gameHistory.pop();
-        renderSavedHistory(); saveData();
-    }
-    function renderSavedHistory() {
-        document.getElementById('history-signals').innerHTML = gameHistory.map(v => `<div class="hist-item ${v>=2?'hist-high':''}">${v}x</div>`).join('');
-    }
-
+    function addHistory(v) { gameHistory.unshift(v); if(gameHistory.length > 20) gameHistory.pop(); renderSavedHistory(); saveData(); }
+    function renderSavedHistory() { document.getElementById('history-signals').innerHTML = gameHistory.map(v => `<div class="hist-item ${v>=2?'hist-high':''}">${v}x</div>`).join(''); }
     function handleBet(p) {
         let v = parseFloat(document.getElementById('amt'+p).value);
-        if(!isFlying) {
-            if(!bets[p].active) { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].active = true; } }
-            else { balance += bets[p].amt; bets[p].active = false; }
-        } else {
-            if(bets[p].active) doCash(p);
-            else { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].waiting = true; } }
-        }
+        if(!isFlying) { if(!bets[p].active) { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].active = true; } } else { balance += bets[p].amt; bets[p].active = false; } }
+        else { if(bets[p].active) doCash(p); else { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].waiting = true; } } }
         refreshBtn(p); refreshUI();
     }
-
-    function doCash(p) {
-        balance += (bets[p].amt * multiplier); bets[p].active = false;
-        refreshBtn(p); refreshUI();
-    }
-
+    function doCash(p) { balance += (bets[p].amt * multiplier); bets[p].active = false; refreshBtn(p); refreshUI(); }
     function refreshBtn(p) {
         let b = document.getElementById('btn'+p); let v = document.getElementById('amt'+p).value;
         if(bets[p].waiting) { b.className="btn-main waiting-mode"; b.innerHTML="WAITING..."; }
         else { b.className=bets[p].active?"btn-main waiting-mode":"btn-main"; b.innerHTML=bets[p].active?"CANCEL":`BET <span>${v} BDT</span>`; }
     }
-
     function chAmt(p, v) { let i = document.getElementById('amt'+p); i.value = Math.max(1, parseFloat(i.value) + v).toFixed(2); refreshBtn(p); }
     function setFixedAmt(p, v) { document.getElementById('amt'+p).value = v.toFixed(2); refreshBtn(p); }
     function setTab(p, m) { document.getElementById('auto'+p).classList.toggle('active', m==='auto'); }
