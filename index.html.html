@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviator Pro </title>
+    <title>Aviator Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,31 +15,10 @@
             --ref-green: #00ff88;
         }
 
-        body { margin: 0; background: var(--bg-dark); font-family: 'Roboto', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        body { margin: 0; background: var(--bg-dark); font-family: 'Roboto', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; user-select: none; }
 
-        /* Helpline Button - Reverted to Sky Blue & Draggable */
-        .helpline-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #0088cc; /* Sky Blue Design */
-            color: white;
-            padding: 10px 18px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            z-index: 4000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            cursor: move;
-            touch-action: none;
-        }
+        .helpline-btn { position: fixed; bottom: 20px; right: 20px; background: #0088cc; color: white; padding: 10px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 14px; z-index: 4000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.2); cursor: move; touch-action: none; }
 
-        /* Auth Styles */
         #authOverlay { position: fixed; inset: 0; background: #121314; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .auth-card { background: #1b1c1d; width: 90%; max-width: 400px; padding: 30px; border-radius: 15px; border: 1px solid var(--aviator-red); text-align: center; }
         .auth-card h2 { color: var(--aviator-red); margin-bottom: 20px; font-weight: 900; }
@@ -49,25 +28,12 @@
         .auth-link { color: var(--ref-green); cursor: pointer; text-decoration: underline; }
         .game-title-auth { font-size: 28px; font-weight: 900; color: var(--aviator-red); margin-bottom: 15px; font-style: italic; }
 
-        /* Main Game Styles */
-        .history-bar {
-            width: 100%; background: #141516; padding: 6px 10px;
-            display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid #333;
-            min-height: 35px; align-items: center; white-space: nowrap; scrollbar-width: none;
-        }
+        .history-bar { width: 100%; background: #141516; padding: 6px 10px; display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid #333; min-height: 35px; align-items: center; white-space: nowrap; scrollbar-width: none; }
         .history-bar::-webkit-scrollbar { display: none; }
-        .hist-item {
-            font-size: 11px; font-weight: bold; padding: 3px 12px;
-            border-radius: 15px; background: #222; color: #34b4ff; border: 1px solid #333;
-        }
+        .hist-item { font-size: 11px; font-weight: bold; padding: 3px 12px; border-radius: 15px; background: #222; color: #34b4ff; border: 1px solid #333; }
         .hist-high { color: #913ef8; }
 
-        .header { 
-            width: 100%; padding: 10px 15px; 
-            display: grid; grid-template-columns: 1fr 1fr 1fr; 
-            align-items: center; background: #1b1c1d; 
-            border-bottom: 1px solid #333; box-sizing: border-box; 
-        }
+        .header { width: 100%; padding: 10px 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; background: #1b1c1d; border-bottom: 1px solid #333; box-sizing: border-box; }
         .menu-btn { background: none; border: none; color: #ccc; font-size: 24px; cursor: pointer; justify-self: start; }
         .brand-name { color: var(--aviator-red); font-weight: 900; font-style: italic; font-size: 20px; text-align: center; }
         .balance-box { color: #00ff88; font-weight: bold; background: #000; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; font-size: 13px; justify-self: end; }
@@ -85,7 +51,7 @@
         .ref-container { background: #1b1c1d; border: 2px dashed var(--ref-green); border-radius: 12px; padding: 15px; text-align: left; margin: 20px 0; }
         .ref-header { display: flex; align-items: center; gap: 8px; color: var(--ref-green); font-weight: bold; font-size: 14px; margin-bottom: 8px; }
         .ref-link-display { font-size: 10px; color: #888; word-break: break-all; display: block; margin-bottom: 12px; line-height: 1.4; }
-        .copy-ref-btn { background: var(--ref-green) !important; color: black !important; font-weight: 900 !important; border-radius: 5px !important; padding: 10px !important; font-size: 14px !important; letter-spacing: 0.5px; }
+        .copy-ref-btn { background: var(--ref-green) !important; color: black !important; font-weight: 900 !important; border-radius: 5px !important; padding: 10px !important; font-size: 14px !important; }
 
         .bet-container { width: 95%; max-width: 450px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
         .bet-panel { background: var(--panel-bg); border-radius: 15px; padding: 12px; border: 1px solid #333; }
@@ -107,17 +73,15 @@
         .plus-minus button { background: #333; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
         .quick-bet-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .quick-btn { background: #222; border: 1px solid #333; color: #ccc; padding: 5px; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: bold; }
-        .quick-btn:hover { background: #333; }
         .btn-main { flex: 1.3; height: 75px; border-radius: 15px; border: none; color: white; font-weight: 800; background: var(--btn-green); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .btn-main span { font-size: 16px; display: block; }
         .btn-main.cashout-active { background: var(--btn-yellow) !important; color: black !important; }
         .btn-main.waiting-mode { background: #444 !important; color: #aaa !important; cursor: default; }
         .copy-box { background: #000; padding: 10px; border-radius: 5px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
         .copy-btn { background: #333; color: #00ff88; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
         .req-card { background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: left; font-size: 13px; color: #fff; }
         .req-btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        .approve-btn { background: #28a745 !important; flex: 1; height: 35px; }
-        .cancel-btn { background: #d11d33 !important; flex: 1; height: 35px; }
+        .approve-btn { background: #28a745 !important; flex: 1; height: 35px; color: white; border: none; border-radius: 5px; }
+        .cancel-btn { background: #d11d33 !important; flex: 1; height: 35px; color: white; border: none; border-radius: 5px; }
         .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         .history-table th, .history-table td { border: 1px solid #333; padding: 8px; text-align: center; }
         .status-Approved { color: #00ff88; }
@@ -214,7 +178,7 @@
             <div id="adminDashboard" style="display:none">
                 <h4 style="border-bottom:1px solid #333; padding-bottom:5px">Pending Requests</h4>
                 <div id="requestList"></div>
-                <button style="background:#555" onclick="clearAllData()">Reset All Data</button>
+                <button style="background:#555; color:white; border:none; padding:10px; width:100%; border-radius:5px;" onclick="clearAllData()">Reset All Data</button>
             </div>
         </div>
     </div>
@@ -290,35 +254,17 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
-    // --- Firebase Initialization ---
-    const firebaseConfig = {
-        databaseURL: "https://aviatorpro-e7334-default-rtdb.firebaseio.com/"
-    };
+    const firebaseConfig = { databaseURL: "https://aviatorpro-e7334-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- Original Script Logic Re-integrated ---
     const _0xkey1 = "YXZpX2JhbA=="; 
-    const _0xkey2 = "YXZpX3JlcXM="; 
     const _0xadm = "aGFzYW5qY2QwMzc1"; 
     const _0xhist = "YXZpX2dhbWVfaGlzdA=="; 
     const _0xusr = "YXZpX3VzZXJz"; 
     const _0xses = "YXZpX3Nlc3Npb24="; 
-
     function _d(s){return atob(s);}
 
-    // Draggable Helpline
-    const dragBtn = document.getElementById("helplineBtn");
-    let isDragging = false;
-    let offset = { x: 0, y: 0 };
-    function startDrag(e) { isDragging = true; const clX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX; const clY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY; offset.x = clX - dragBtn.offsetLeft; offset.y = clY - dragBtn.offsetTop; }
-    function doDrag(e) { if (!isDragging) return; e.preventDefault(); const clX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX; const clY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY; dragBtn.style.left = (clX - offset.x) + 'px'; dragBtn.style.top = (clY - offset.y) + 'px'; dragBtn.style.right = 'auto'; dragBtn.style.bottom = 'auto'; }
-    function stopDrag() { isDragging = false; }
-    dragBtn.addEventListener('mousedown', startDrag); dragBtn.addEventListener('touchstart', startDrag);
-    window.addEventListener('mousemove', doDrag); window.addEventListener('touchmove', doDrag, { passive: false });
-    window.addEventListener('mouseup', stopDrag); window.addEventListener('touchend', stopDrag);
-
-    // Auth & Game Variables
     let balance = parseFloat(localStorage.getItem(_d(_0xkey1))) || 0.00;
     let gameHistory = JSON.parse(localStorage.getItem(_d(_0xhist))) || [];
     let isFlying = false;
@@ -326,57 +272,60 @@
     let crashPoint = 0;
     let bets = { 1: { active: false, waiting: false, amt: 0 }, 2: { active: false, waiting: false, amt: 0 } };
 
-    function toggleAuth(isLogin) {
-        document.getElementById('loginBox').style.display = isLogin ? 'block' : 'none';
-        document.getElementById('regBox').style.display = isLogin ? 'none' : 'block';
+    // হেল্পলাইন বাটন ড্র্যাগিং লজিক
+    const dragBtn = document.getElementById("helplineBtn");
+    let isDragging = false;
+    let offset = { x: 0, y: 0 };
+
+    function startDrag(e) { 
+        isDragging = true; 
+        const clX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX; 
+        const clY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY; 
+        offset.x = clX - dragBtn.offsetLeft; 
+        offset.y = clY - dragBtn.offsetTop; 
     }
 
-    function handleReg() {
-        let ph = document.getElementById('regPhone').value;
-        let ps = document.getElementById('regPass').value;
-        let cp = document.getElementById('regConfirm').value;
-        let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
-        if(ph.length < 10 || ps.length < 4) return alert("Invalid Details!");
-        if(ps !== cp) return alert("Passwords don't match!");
-        users.push({ ph: ph, ps: ps });
-        localStorage.setItem(_d(_0xusr), JSON.stringify(users));
-        localStorage.setItem(_d(_0xses), ph);
-        location.reload();
+    function doDrag(e) { 
+        if (!isDragging) return; 
+        e.preventDefault(); 
+        const clX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX; 
+        const clY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY; 
+        dragBtn.style.left = (clX - offset.x) + 'px'; 
+        dragBtn.style.top = (clY - offset.y) + 'px'; 
+        dragBtn.style.right = 'auto'; 
+        dragBtn.style.bottom = 'auto'; 
     }
 
-    function handleLogin() {
-        let ph = document.getElementById('logPhone').value;
-        let ps = document.getElementById('logPass').value;
-        let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
-        let user = users.find(u => u.ph === ph && u.ps === ps);
-        if(user) { localStorage.setItem(_d(_0xses), ph); location.reload(); }
-        else alert("Wrong Phone or Password!");
-    }
+    function stopDrag() { isDragging = false; }
 
-    function handleLogout() { localStorage.removeItem(_d(_0xses)); location.reload(); }
+    dragBtn.addEventListener('mousedown', startDrag); 
+    dragBtn.addEventListener('touchstart', startDrag);
+    window.addEventListener('mousemove', doDrag); 
+    window.addEventListener('touchmove', doDrag, { passive: false });
+    window.addEventListener('mouseup', stopDrag); 
+    window.addEventListener('touchend', stopDrag);
 
     function init() {
-        if(localStorage.getItem(_d(_0xses))) document.getElementById('authOverlay').style.display = 'none';
+        const session = localStorage.getItem(_d(_0xses));
+        if(session) {
+            document.getElementById('authOverlay').style.display = 'none';
+            loadReferData(session);
+        }
         refreshUI(); renderSavedHistory(); startCycle();
-        document.getElementById('refLink').innerText = window.location.origin + window.location.pathname + "?ref=REF" + Math.floor(Math.random()*9999);
     }
 
-    function saveData() {
-        localStorage.setItem(_d(_0xkey1), balance);
-        localStorage.setItem(_d(_0xhist), JSON.stringify(gameHistory));
-    }
-    
     function refreshUI() { 
         document.getElementById('balance').innerText = balance.toFixed(2); 
-        saveData();
-        renderUserHistory(); 
+        localStorage.setItem(_d(_0xkey1), balance);
+        localStorage.setItem(_d(_0xhist), JSON.stringify(gameHistory));
+        renderUserHistory();
     }
 
-    // --- Firebase Functions for Requests ---
+    // --- ডিপোজিট ও উইথড্র লজিক ---
     function submitDeposit() {
         let amt = parseFloat(document.getElementById('depAmt').value);
         let trx = document.getElementById('trxId').value;
-        let userPh = localStorage.getItem(_d(_0xses)) || "Unknown";
+        let userPh = localStorage.getItem(_d(_0xses));
         if(amt >= 80 && trx) {
             let id = Date.now();
             db.ref('requests/' + id).set({
@@ -384,28 +333,96 @@
                 method: document.getElementById('depMethod').value, 
                 status: 'Pending', user: userPh
             }).then(() => { alert("Deposit Request Sent!"); closeModals(); });
-        }
+        } else alert("Enter Amount (Min 80) and TrxID");
     }
 
     function submitWithdraw() {
         let amt = parseFloat(document.getElementById('withAmt').value);
         let num = document.getElementById('withNum').value;
-        let userPh = localStorage.getItem(_d(_0xses)) || "Unknown";
+        let userPh = localStorage.getItem(_d(_0xses));
         if(amt >= 100 && num && balance >= amt) {
+            balance -= amt; refreshUI();
             let id = Date.now();
             db.ref('requests/' + id).set({
                 id: id, type: 'WITH', amt: amt, info: num, 
                 method: document.getElementById('withMethod').value, 
                 status: 'Pending', user: userPh
-            }).then(() => {
-                balance -= amt; refreshUI();
-                alert("Withdraw Request Sent!"); closeModals();
-            });
-        } else alert("Insufficient Balance!");
+            }).then(() => { alert("Withdraw Request Sent!"); closeModals(); });
+        } else alert("Insufficient Balance or Min 100");
     }
 
+    // --- অ্যাডমিন লজিক (বোনাস ও রিফান্ড ঠিক করা হয়েছে) ---
+    function manageFirebaseReq(key, action) {
+        db.ref('requests/' + key).once('value').then((snap) => {
+            let r = snap.val();
+            if(!r || r.status !== 'Pending') return;
+
+            let currentSessionUser = localStorage.getItem(_d(_0xses));
+
+            if(action === 'Approve') {
+                if(r.type === 'DEP') {
+                    let bonus = r.amt * 0.30;
+                    let totalToAdd = r.amt + bonus;
+                    if(r.user === currentSessionUser) {
+                        balance += totalToAdd; refreshUI();
+                    }
+                }
+                db.ref('requests/' + key).update({ status: 'Approved' });
+            } else {
+                if(r.type === 'WITH') {
+                    if(r.user === currentSessionUser) {
+                        balance += r.amt; refreshUI(); // রিফান্ড
+                    }
+                }
+                db.ref('requests/' + key).update({ status: 'Cancelled' });
+            }
+        });
+    }
+
+    // --- রেফার সিস্টেম লজিক ---
+    function loadReferData(userPh) {
+        let myCode = "REF" + userPh.slice(-4);
+        document.getElementById('refLink').innerText = window.location.origin + window.location.pathname + "?ref=" + myCode;
+        
+        db.ref('users/' + userPh + '/referStats').on('value', (snap) => {
+            let data = snap.val() || { count: 0, bonus: 0 };
+            document.getElementById('totalRef').innerText = data.count;
+            document.getElementById('totalBonus').innerText = "৳" + data.bonus.toFixed(2);
+        });
+    }
+
+    function handleReg() {
+        let ph = document.getElementById('regPhone').value;
+        let ps = document.getElementById('regPass').value;
+        let refUsed = document.getElementById('regRef').value;
+        let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
+
+        if(ph.length < 10) return alert("Invalid Phone");
+        
+        if(refUsed.includes("REF")) {
+            db.ref('refer_map/' + refUsed).once('value').then((snap) => {
+                let parentUser = snap.val();
+                if(parentUser) {
+                    db.ref('users/' + parentUser + '/referStats').transaction((curr) => {
+                        let c = curr || { count: 0, bonus: 0 };
+                        return { count: c.count + 1, bonus: c.bonus + 5 }; // ৫ টাকা বোনাস
+                    });
+                }
+            });
+        }
+
+        let myRef = "REF" + ph.slice(-4);
+        db.ref('refer_map/' + myRef).set(ph);
+        
+        users.push({ ph: ph, ps: ps });
+        localStorage.setItem(_d(_0xusr), JSON.stringify(users));
+        localStorage.setItem(_d(_0xses), ph);
+        location.reload();
+    }
+
+    // --- হেল্পার ফাংশনসমূহ ---
     function renderAdminRequests() {
-        let list = document.getElementById('requestList'); if(!list) return;
+        let list = document.getElementById('requestList'); list.innerHTML = "";
         db.ref('requests').on('value', (snap) => {
             list.innerHTML = "";
             let data = snap.val();
@@ -413,25 +430,13 @@
                 let req = data[key];
                 if(req.status === 'Pending') {
                     let div = document.createElement('div'); div.className = "req-card";
-                    div.innerHTML = `<b>${req.type}</b> (${req.user})<br>Amt: ${req.amt}<br>Trx/Num: ${req.info}
+                    div.innerHTML = `<b>${req.type}</b> - ${req.user}<br>Amt: ${req.amt} | ${req.info}
                     <div class="req-btn-group">
                         <button class="approve-btn" onclick="manageFirebaseReq('${key}', 'Approve')">Approve</button>
-                        <button class="cancel-btn" onclick="manageFirebaseReq('${key}', 'Cancel')">Cancel</button>
+                        <button class="cancel-btn" onclick="manageFirebaseReq('${key}', 'Cancel')">Reject</button>
                     </div>`;
                     list.appendChild(div);
                 }
-            }
-        });
-    }
-
-    function manageFirebaseReq(key, action) {
-        db.ref('requests/' + key).once('value').then((snap) => {
-            let r = snap.val();
-            if(action === 'Approve') {
-                // Note: Balance is local, you may need to handle user-specific balance in DB for full automation
-                db.ref('requests/' + key).update({ status: 'Approved' });
-            } else {
-                db.ref('requests/' + key).update({ status: 'Cancelled' });
             }
         });
     }
@@ -440,30 +445,20 @@
         let dH = document.getElementById('depHistoryList'); let wH = document.getElementById('withHistoryList');
         if(!dH || !wH) return;
         let userPh = localStorage.getItem(_d(_0xses));
-        db.ref('requests').on('value', (snap) => {
+        db.ref('requests').orderByChild('user').equalTo(userPh).on('value', (snap) => {
             let data = snap.val();
-            let dTable = `<table class="history-table"><tr><th>Amt</th><th>Info</th><th>Status</th></tr>`;
+            let dTable = `<table class="history-table"><tr><th>Amt</th><th>Trx/Num</th><th>Status</th></tr>`;
             let wTable = dTable;
             for(let key in data) {
                 let r = data[key];
-                if(r.user === userPh) {
-                    let row = `<tr><td>${r.amt}</td><td>${r.info}</td><td class="status-${r.status}">${r.status}</td></tr>`;
-                    if(r.type === 'DEP') dTable += row; else wTable += row;
-                }
+                let row = `<tr><td>${r.amt}</td><td>${r.info}</td><td class="status-${r.status}">${r.status}</td></tr>`;
+                if(r.type === 'DEP') dTable += row; else wTable += row;
             }
             dH.innerHTML = dTable + "</table>"; wH.innerHTML = wTable + "</table>";
         });
     }
 
-    // --- Game Engine (Original) ---
-    function updateDepNumbers() { const m = document.getElementById('depMethod').value; document.getElementById('activeDepNum').innerText = m === "Bkash" ? "Bkash: 01933098049" : "Nagad: 01765943426"; }
-    function copyDepNumber() { copyText(document.getElementById('activeDepNum').innerText.split(': ')[1]); }
-    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
-    function openModal(id) { toggleMenu(); document.getElementById(id).style.display = "block"; if(id==='adminModal') renderAdminRequests(); }
-    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
-    function copyText(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
-    function checkAdmin() { if(document.getElementById('adminPass').value === _d(_0xadm)) { document.getElementById('adminLogin').style.display = "none"; document.getElementById('adminDashboard').style.display = "block"; renderAdminRequests(); } else alert("Denied!"); }
-
+    // --- গেম ইঞ্জিন লজিক ---
     function startCycle() {
         isFlying = false; multiplier = 1.00;
         crashPoint = (Math.random() * 3.5 + 1.02).toFixed(2);
@@ -501,7 +496,7 @@
         }, 50);
     }
 
-    function addHistory(v) { gameHistory.unshift(v); if(gameHistory.length > 20) gameHistory.pop(); renderSavedHistory(); saveData(); }
+    function addHistory(v) { gameHistory.unshift(v); if(gameHistory.length > 20) gameHistory.pop(); renderSavedHistory(); }
     function renderSavedHistory() { document.getElementById('history-signals').innerHTML = gameHistory.map(v => `<div class="hist-item ${v>=2?'hist-high':''}">${v}x</div>`).join(''); }
     function handleBet(p) {
         let v = parseFloat(document.getElementById('amt'+p).value);
@@ -518,6 +513,21 @@
     function chAmt(p, v) { let i = document.getElementById('amt'+p); i.value = Math.max(1, parseFloat(i.value) + v).toFixed(2); refreshBtn(p); }
     function setFixedAmt(p, v) { document.getElementById('amt'+p).value = v.toFixed(2); refreshBtn(p); }
     function setTab(p, m) { document.getElementById('auto'+p).classList.toggle('active', m==='auto'); }
+    function toggleAuth(isLogin) { document.getElementById('loginBox').style.display = isLogin ? 'block' : 'none'; document.getElementById('regBox').style.display = isLogin ? 'none' : 'block'; }
+    function handleLogin() {
+        let ph = document.getElementById('logPhone').value; let ps = document.getElementById('logPass').value;
+        let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
+        let user = users.find(u => u.ph === ph && u.ps === ps);
+        if(user) { localStorage.setItem(_d(_0xses), ph); location.reload(); } else alert("Wrong Login!");
+    }
+    function handleLogout() { localStorage.removeItem(_d(_0xses)); location.reload(); }
+    function updateDepNumbers() { const m = document.getElementById('depMethod').value; document.getElementById('activeDepNum').innerText = m === "Bkash" ? "Bkash: 01933098049" : "Nagad: 01765943426"; }
+    function copyDepNumber() { navigator.clipboard.writeText(document.getElementById('activeDepNum').innerText.split(': ')[1]); alert("Copied!"); }
+    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
+    function openModal(id) { toggleMenu(); document.getElementById(id).style.display = "block"; if(id==='adminModal') renderAdminRequests(); }
+    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
+    function copyText(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
+    function checkAdmin() { if(document.getElementById('adminPass').value === _d(_0xadm)) { document.getElementById('adminLogin').style.display = "none"; document.getElementById('adminDashboard').style.display = "block"; renderAdminRequests(); } else alert("Denied!"); }
     function clearAllData() { localStorage.clear(); location.reload(); }
 </script>
 </body>
