@@ -17,6 +17,39 @@
 
         body { margin: 0; background: var(--bg-dark); font-family: 'Roboto', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 
+        /* Helpline Button - Reverted to Sky Blue & Draggable */
+        .helpline-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0088cc; /* Sky Blue Design */
+            color: white;
+            padding: 10px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 4000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: move;
+            touch-action: none;
+        }
+
+        /* Auth Styles */
+        #authOverlay { position: fixed; inset: 0; background: #121314; z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: #1b1c1d; width: 90%; max-width: 400px; padding: 30px; border-radius: 15px; border: 1px solid var(--aviator-red); text-align: center; }
+        .auth-card h2 { color: var(--aviator-red); margin-bottom: 20px; font-weight: 900; }
+        .auth-card input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
+        .auth-card button { background: var(--aviator-red); color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .auth-card p { font-size: 13px; color: #888; margin-top: 15px; }
+        .auth-link { color: var(--ref-green); cursor: pointer; text-decoration: underline; }
+        .game-title-auth { font-size: 28px; font-weight: 900; color: var(--aviator-red); margin-bottom: 15px; font-style: italic; }
+
+        /* Main Game Styles */
         .history-bar {
             width: 100%; background: #141516; padding: 6px 10px;
             display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid #333;
@@ -43,14 +76,12 @@
         #plane { position: absolute; bottom: 20px; left: -100px; width: 65px; z-index: 10; }
         .multiplier { position: absolute; width: 100%; top: 35%; text-align: center; font-size: 55px; font-weight: 900; z-index: 5; }
 
-        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
         .modal-content { background: #1b1c1d; margin: 5% auto; padding: 20px; width: 90%; max-width: 450px; border-radius: 15px; border: 1px solid var(--aviator-red); text-align: center; }
         .modal input, .modal select { width: 90%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: #00ff88; border-radius: 5px; }
         .modal button { background: var(--aviator-red); border: none; color: white; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         .close-modal { float: right; cursor: pointer; font-size: 24px; color: #888; }
 
-        /* Referral Design */
         .ref-container { background: #1b1c1d; border: 2px dashed var(--ref-green); border-radius: 12px; padding: 15px; text-align: left; margin: 20px 0; }
         .ref-header { display: flex; align-items: center; gap: 8px; color: var(--ref-green); font-weight: bold; font-size: 14px; margin-bottom: 8px; }
         .ref-link-display { font-size: 10px; color: #888; word-break: break-all; display: block; margin-bottom: 12px; line-height: 1.4; }
@@ -101,6 +132,31 @@
 </head>
 <body onload="init()">
 
+    <a href="avaitor-game-live-support.vercel.app" target="_blank" class="helpline-btn" id="helplineBtn">
+        <span>🎧 Helpline</span>
+    </a>
+
+    <div id="authOverlay">
+        <div class="auth-card" id="loginBox">
+            <h2>LOGIN</h2>
+            <input type="text" id="logPhone" placeholder="Phone Number">
+            <input type="password" id="logPass" placeholder="Password">
+            <div class="game-title-auth">AVIATOR GAME</div>
+            <button onclick="handleLogin()">LOGIN</button>
+            <p>Don't have an account? <span class="auth-link" onclick="toggleAuth(false)">Register</span></p>
+        </div>
+        <div class="auth-card" id="regBox" style="display:none">
+            <h2>REGISTER</h2>
+            <input type="text" id="regPhone" placeholder="Phone Number">
+            <input type="password" id="regPass" placeholder="Password">
+            <input type="password" id="regConfirm" placeholder="Confirm Password">
+            <input type="text" id="regRef" placeholder="Refer Code (Optional)">
+            <div class="game-title-auth">AVIATOR GAME</div>
+            <button onclick="handleReg()">REGISTER</button>
+            <p>Already have an account? <span class="auth-link" onclick="toggleAuth(true)">Login</span></p>
+        </div>
+    </div>
+
     <div class="history-bar" id="history-signals"></div>
 
     <div class="header">
@@ -120,8 +176,11 @@
             <h3 style="color:var(--aviator-red); margin-bottom: 5px;">DEPOSIT</h3>
             <p style="color: #28a745; font-weight: bold; font-size: 14px; margin: 0 0 10px 0;">💸 30% Deposit Bonus 💸</p>
             <p style="font-size: 12px; color: #888;">Min Deposit: ৳80</p>
-            <div class="copy-box"><span>Bkash: 01933098049</span><button class="copy-btn" onclick="copyText('01933098049')">COPY</button></div>
-            <div class="copy-box"><span>Nagad: 01765943426</span><button class="copy-btn" onclick="copyText('01765943426')">COPY</button></div>
+            <select id="depMethod" onchange="updateDepNumbers()">
+                <option value="Bkash">Bkash</option>
+                <option value="Nagad">Nagad</option>
+            </select>
+            <div class="copy-box"><span id="activeDepNum">Bkash: 01933098049</span><button class="copy-btn" onclick="copyDepNumber()">COPY</button></div>
             <input type="number" id="depAmt" placeholder="Amount (Min 80)">
             <input type="text" id="trxId" placeholder="TrxID">
             <button onclick="submitDeposit()">SUBMIT REQUEST</button>
@@ -164,26 +223,21 @@
         <div class="modal-content" style="border:none; text-align: left; background: transparent;">
             <span class="close-modal" onclick="closeModals()" style="color:white; float:right;">&times;</span>
             <h1 style="color:var(--ref-green); font-size: 38px; margin: 0; font-weight: 900;">Menu</h1>
-            
             <div class="ref-container">
-                <div class="ref-header">
-                    <span>🔗</span>
-                    <span>Referral Link (5% Bonus)</span>
-                </div>
+                <div class="ref-header">🔗 Referral Link (5% Bonus)</div>
                 <span id="refLink" class="ref-link-display"></span>
-                <button class="copy-ref-btn" onclick="copyText(document.getElementById('refLink').innerText)">
-                    COPY REFERRAL LINK
-                </button>
+                <button class="copy-ref-btn" onclick="copyText(document.getElementById('refLink').innerText)">COPY REFERRAL LINK</button>
+                <div style="margin-top: 15px; color: white; font-size: 14px; border-top: 1px solid #333; padding-top: 10px;">
+                    <p>Total Refers: <span id="totalRef" style="color: var(--ref-green);">0</span></p>
+                    <p>Total Bonus: <span id="totalBonus" style="color: var(--ref-green);">৳0.00</span></p>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="bet-container">
         <div class="bet-panel" id="panel1">
-            <div class="tab-row">
-                <div class="tab active" onclick="setTab(1, 'bet')">Bet</div>
-                <div class="tab" onclick="setTab(1, 'auto')">Auto</div>
-            </div>
+            <div class="tab-row"><div class="tab active" onclick="setTab(1, 'bet')">Bet</div><div class="tab" onclick="setTab(1, 'auto')">Auto</div></div>
             <div class="auto-section" id="auto1">
                 <div class="auto-row"><span>Auto Bet</span><label class="switch"><input type="checkbox" id="ab1"><span class="slider"></span></label></div>
                 <div class="auto-row"><span>Auto Cashout</span><label class="switch"><input type="checkbox" id="ac1"><span class="slider"></span></label><input type="number" id="acv1" value="2.00" step="0.1" style="width:45px; background:#000; border:1px solid #444; text-align:center; color:#00ff88;"></div>
@@ -201,12 +255,8 @@
                 <button class="btn-main" id="btn1" onclick="handleBet(1)">BET <span>10.00 BDT</span></button>
             </div>
         </div>
-
         <div class="bet-panel" id="panel2">
-            <div class="tab-row">
-                <div class="tab active" onclick="setTab(2, 'bet')">Bet</div>
-                <div class="tab" onclick="setTab(2, 'auto')">Auto</div>
-            </div>
+            <div class="tab-row"><div class="tab active" onclick="setTab(2, 'bet')">Bet</div><div class="tab" onclick="setTab(2, 'auto')">Auto</div></div>
             <div class="auto-section" id="auto2">
                 <div class="auto-row"><span>Auto Bet</span><label class="switch"><input type="checkbox" id="ab2"><span class="slider"></span></label></div>
                 <div class="auto-row"><span>Auto Cashout</span><label class="switch"><input type="checkbox" id="ac2"><span class="slider"></span></label><input type="number" id="acv2" value="2.00" step="0.1" style="width:45px; background:#000; border:1px solid #444; text-align:center; color:#00ff88;"></div>
@@ -233,179 +283,210 @@
         <div class="menu-item" onclick="openModal('withModal')">🏧 Withdraw</div>
         <div class="menu-item" onclick="openModal('refModal')">🔗 Referral</div>
         <div class="menu-item" onclick="openModal('adminModal')">🛠 Admin Panel</div>
-        <div class="menu-item" onclick="location.reload()">🔄 Refresh Game</div>
+        <div class="menu-item" onclick="handleLogout()">🚪 Logout</div>
     </div>
 
 <script>
-    // Security: Encoded Admin Password and storage keys
-    const _0xkey1 = "YXZpX2JhbA=="; // avi_bal
-    const _0xkey2 = "YXZpX3JlcXM="; // avi_reqs
-    const _0xadm = "aGFzYW5qY2QwMzc1"; // aGFzYW5qY2QwMzc1 (Encoded)
+    // --- Draggable Helpline Script ---
+    const dragBtn = document.getElementById("helplineBtn");
+    let isDragging = false;
+    let offset = { x: 0, y: 0 };
+
+    function startDrag(e) {
+        isDragging = true;
+        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+        offset.x = clientX - dragBtn.offsetLeft;
+        offset.y = clientY - dragBtn.offsetTop;
+    }
+
+    function doDrag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+        dragBtn.style.left = (clientX - offset.x) + 'px';
+        dragBtn.style.top = (clientY - offset.y) + 'px';
+        dragBtn.style.right = 'auto';
+        dragBtn.style.bottom = 'auto';
+    }
+
+    function stopDrag() { isDragging = false; }
+
+    dragBtn.addEventListener('mousedown', startDrag);
+    dragBtn.addEventListener('touchstart', startDrag);
+    window.addEventListener('mousemove', doDrag);
+    window.addEventListener('touchmove', doDrag, { passive: false });
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchend', stopDrag);
+
+    // --- Original Script Logic ---
+    const _0xkey1 = "YXZpX2JhbA=="; 
+    const _0xkey2 = "YXZpX3JlcXM="; 
+    const _0xadm = "aGFzYW5qY2QwMzc1"; 
+    const _0xhist = "YXZpX2dhbWVfaGlzdA=="; 
+    const _0xusr = "YXZpX3VzZXJz"; 
+    const _0xses = "YXZpX3Nlc3Npb24="; 
 
     function _d(s){return atob(s);}
 
+    function toggleAuth(isLogin) {
+        document.getElementById('loginBox').style.display = isLogin ? 'block' : 'none';
+        document.getElementById('regBox').style.display = isLogin ? 'none' : 'block';
+    }
+
+    function handleReg() {
+        let ph = document.getElementById('regPhone').value;
+        let ps = document.getElementById('regPass').value;
+        let cp = document.getElementById('regConfirm').value;
+        let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
+        if(ph.length < 10 || ps.length < 4) return alert("Invalid Details!");
+        if(ps !== cp) return alert("Passwords don't match!");
+        if(users.find(u => u.ph === ph)) return alert("User already exists with this number!");
+        users.push({ ph: ph, ps: ps });
+        localStorage.setItem(_d(_0xusr), JSON.stringify(users));
+        localStorage.setItem(_d(_0xses), ph);
+        alert("Registration Successful!");
+        location.reload();
+    }
+
+    function handleLogin() {
+        let ph = document.getElementById('logPhone').value;
+        let ps = document.getElementById('logPass').value;
+        let users = JSON.parse(localStorage.getItem(_d(_0xusr))) || [];
+        let user = users.find(u => u.ph === ph && u.ps === ps);
+        if(user) { localStorage.setItem(_d(_0xses), ph); location.reload(); }
+        else { alert("Wrong Phone or Password!"); }
+    }
+
+    function handleLogout() { localStorage.removeItem(_d(_0xses)); location.reload(); }
+
     let balance = parseFloat(localStorage.getItem(_d(_0xkey1))) || 0.00;
     let requests = JSON.parse(localStorage.getItem(_d(_0xkey2))) || [];
+    let gameHistory = JSON.parse(localStorage.getItem(_d(_0xhist))) || [];
+    let totalRefers = parseInt(localStorage.getItem('avi_total_ref')) || 0;
+    let totalBonus = parseFloat(localStorage.getItem('avi_total_bonus')) || 0.00;
+
     let isFlying = false;
     let multiplier = 1.00;
     let crashPoint = 0;
     let bets = { 1: { active: false, waiting: false, amt: 0 }, 2: { active: false, waiting: false, amt: 0 } };
 
-    // Anti-Inspect: Disable Right Click & Keys
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.onkeydown = function(e) {
-        if (e.keyCode == 123 || (e.ctrlKey && (e.shiftKey && e.keyCode == 73)) || (e.ctrlKey && e.keyCode == 85)) {
-            return false;
-        }
-    };
-
-    function init() { 
-        refreshUI(); 
-        startCycle(); 
-        let currentPath = window.location.href.split('?')[0];
-        document.getElementById('refLink').innerText = currentPath + "?ref=REF" + (Math.floor(Math.random() * 8000) + 1000);
+    function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode) { toggleAuth(false); document.getElementById('regRef').value = refCode; }
+        if(localStorage.getItem(_d(_0xses))) { document.getElementById('authOverlay').style.display = 'none'; }
+        refreshUI(); renderSavedHistory(); startCycle();
+        document.getElementById('refLink').innerText = window.location.origin + window.location.pathname + "?ref=REF" + Math.floor(Math.random()*9999);
     }
 
     function saveData() {
         localStorage.setItem(_d(_0xkey1), balance);
         localStorage.setItem(_d(_0xkey2), JSON.stringify(requests));
+        localStorage.setItem(_d(_0xhist), JSON.stringify(gameHistory));
+        localStorage.setItem('avi_total_ref', totalRefers);
+        localStorage.setItem('avi_total_bonus', totalBonus.toFixed(2));
     }
     
     function refreshUI() { 
         document.getElementById('balance').innerText = balance.toFixed(2); 
-        renderAdminRequests();
-        renderUserHistory();
-        saveData();
+        renderAdminRequests(); renderUserHistory(); saveData();
     }
 
+    function updateDepNumbers() {
+        const method = document.getElementById('depMethod').value;
+        document.getElementById('activeDepNum').innerText = method === "Bkash" ? "Bkash: 01933098049" : "Nagad: 01765943426";
+    }
+    function copyDepNumber() { copyText(document.getElementById('activeDepNum').innerText.split(': ')[1]); }
     function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
     function openModal(id) { toggleMenu(); document.getElementById(id).style.display = "block"; refreshUI(); }
     function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
     function copyText(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
 
     function checkAdmin() {
-        // Checking against decoded password
         if(document.getElementById('adminPass').value === _d(_0xadm)) {
             document.getElementById('adminLogin').style.display = "none";
             document.getElementById('adminDashboard').style.display = "block";
             renderAdminRequests();
-        } else { alert("Access Denied!"); }
+        } else alert("Denied!");
     }
 
     function submitDeposit() {
         let amt = parseFloat(document.getElementById('depAmt').value);
         let trx = document.getElementById('trxId').value;
         if(amt >= 80 && trx) {
-            requests.push({ id: Date.now(), type: 'DEP', amt: amt, info: trx, method: 'TrxID', status: 'Pending' });
-            alert("Sent! Wait for Approval.");
-            refreshUI();
-        } else { alert("Min Deposit is 80 BDT!"); }
+            requests.push({ id: Date.now(), type: 'DEP', amt: amt, info: trx, method: document.getElementById('depMethod').value, status: 'Pending' });
+            alert("Request Sent!"); refreshUI();
+        }
     }
 
     function submitWithdraw() {
         let amt = parseFloat(document.getElementById('withAmt').value);
         let num = document.getElementById('withNum').value;
-        let method = document.getElementById('withMethod').value;
         if(amt >= 100 && num && balance >= amt) {
             balance -= amt;
-            requests.push({ id: Date.now(), type: 'WITH', amt: amt, info: num, method: method, status: 'Pending' });
-            alert("Request Sent!");
-            refreshUI();
-        } else { alert("Min Withdraw 100 or Insufficient Balance!"); }
+            requests.push({ id: Date.now(), type: 'WITH', amt: amt, info: num, method: document.getElementById('withMethod').value, status: 'Pending' });
+            alert("Request Sent!"); refreshUI();
+        }
     }
 
     function renderAdminRequests() {
-        let list = document.getElementById('requestList');
-        if(!list) return;
+        let list = document.getElementById('requestList'); if(!list) return;
         list.innerHTML = "";
-        let pending = requests.filter(r => r.status === 'Pending');
-        if(pending.length === 0) { list.innerHTML = "<p>No Pending Requests</p>"; return; }
-        
-        pending.forEach(req => {
-            let div = document.createElement('div');
-            div.className = "req-card";
-            div.innerHTML = `
-                <b>${req.type === 'DEP' ? 'DEPOSIT' : 'WITHDRAW'} (${req.method})</b><br>
-                Amount: ${req.amt} BDT<br>
-                Detail: ${req.info}
-                <div class="req-btn-group">
-                    <button class="approve-btn" onclick="manageReq(${req.id}, 'Approve')">Approve</button>
-                    <button class="cancel-btn" onclick="manageReq(${req.id}, 'Cancel')">Cancel</button>
-                </div>
-            `;
+        requests.filter(r => r.status === 'Pending').forEach(req => {
+            let div = document.createElement('div'); div.className = "req-card";
+            div.innerHTML = `<b>${req.type}</b> (${req.method})<br>Amt: ${req.amt}<br>Info: ${req.info}<div class="req-btn-group"><button class="approve-btn" onclick="manageReq(${req.id}, 'Approve')">Approve</button><button class="cancel-btn" onclick="manageReq(${req.id}, 'Cancel')">Cancel</button></div>`;
             list.appendChild(div);
         });
     }
 
     function renderUserHistory() {
-        let depList = document.getElementById('depHistoryList');
-        let withList = document.getElementById('withHistoryList');
-        if(!depList || !withList) return;
-        let depHTML = `<table class="history-table"><tr><th>Amt</th><th>Info</th><th>Status</th></tr>`;
-        let withHTML = `<table class="history-table"><tr><th>Amt</th><th>Method</th><th>Status</th></tr>`;
-        requests.slice().reverse().forEach(req => {
-            if(req.type === 'DEP') {
-                depHTML += `<tr><td>${req.amt}</td><td>${req.info}</td><td class="status-${req.status}">${req.status}</td></tr>`;
-            } else {
-                withHTML += `<tr><td>${req.amt}</td><td>${req.method}</td><td class="status-${req.status}">${req.status}</td></tr>`;
-            }
-        });
-        depList.innerHTML = depHTML + `</table>`;
-        withList.innerHTML = withHTML + `</table>`;
+        let dH = document.getElementById('depHistoryList'); let wH = document.getElementById('withHistoryList');
+        if(!dH || !wH) return;
+        let buildTable = (type) => {
+            let html = `<table class="history-table"><tr><th>Amt</th><th>Info</th><th>Status</th></tr>`;
+            requests.filter(r => r.type === type).reverse().forEach(r => {
+                html += `<tr><td>${r.amt}</td><td>${r.info}</td><td class="status-${r.status}">${r.status}</td></tr>`;
+            });
+            return html + `</table>`;
+        };
+        dH.innerHTML = buildTable('DEP'); wH.innerHTML = buildTable('WITH');
     }
 
     function manageReq(id, action) {
-        let reqIndex = requests.findIndex(r => r.id === id);
-        let req = requests[reqIndex];
+        let r = requests.find(x => x.id === id);
         if(action === 'Approve') {
-            if(req.type === 'DEP') balance += (req.amt + (req.amt * 0.30));
-            requests[reqIndex].status = 'Approved';
-            alert("Approved!");
+            if(r.type === 'DEP') balance += (r.amt * 1.3);
+            r.status = 'Approved';
         } else {
-            if(req.type === 'WITH') balance += req.amt;
-            requests[reqIndex].status = 'Cancelled';
-            alert("Cancelled!");
+            if(r.type === 'WITH') balance += r.amt;
+            r.status = 'Cancelled';
         }
         refreshUI();
-    }
-
-    function clearAllData() { localStorage.clear(); location.reload(); }
-
-    function setTab(p, mode) {
-        document.getElementById('auto'+p).classList.toggle('active', mode === 'auto');
-        let tabs = document.getElementById('panel'+p).querySelectorAll('.tab');
-        tabs[0].classList.toggle('active', mode === 'bet'); tabs[1].classList.toggle('active', mode === 'auto');
     }
 
     function startCycle() {
         isFlying = false; multiplier = 1.00;
         crashPoint = (Math.random() * 3.5 + 1.02).toFixed(2);
-        let timeLeft = 5; 
-        document.getElementById('mult-text').style.color = "#00ff88"; 
-        document.getElementById('plane').style.left = "-100px";
-        for(let i=1; i<=2; i++) {
-            if(document.getElementById('ab'+i).checked && !bets[i].active && !bets[i].waiting) {
+        let t = 5; document.getElementById('plane').style.left = "-100px";
+        for(let i=1;i<=2;i++) {
+            if(document.getElementById('ab'+i).checked && balance >= parseFloat(document.getElementById('amt'+i).value)) {
                 let v = parseFloat(document.getElementById('amt'+i).value);
-                if(balance >= v) { balance -= v; bets[i].amt = v; bets[i].active = true; }
+                balance -= v; bets[i].amt = v; bets[i].active = true;
             }
             if(bets[i].waiting) { bets[i].active = true; bets[i].waiting = false; }
             refreshBtn(i);
         }
         refreshUI();
-        let countdown = setInterval(() => {
-            if(timeLeft > 0) {
-                document.getElementById('mult-text').innerText = timeLeft;
-                timeLeft--;
-            } else {
-                clearInterval(countdown);
-                launch();
-            }
+        let cd = setInterval(() => {
+            if(t > 0) document.getElementById('mult-text').innerText = t--;
+            else { clearInterval(cd); launch(); }
         }, 1000);
     }
 
     function launch() {
         isFlying = true;
-        document.getElementById('mult-text').style.color = "white";
         let loop = setInterval(() => {
             multiplier += 0.01;
             document.getElementById('mult-text').innerText = multiplier.toFixed(2) + "x";
@@ -421,7 +502,6 @@
                 clearInterval(loop); isFlying = false;
                 addHistory(multiplier.toFixed(2));
                 document.getElementById('mult-text').innerText = "FLEW AWAY!";
-                document.getElementById('mult-text').style.color = "red";
                 for(let i=1; i<=2; i++) { bets[i].active = false; refreshBtn(i); }
                 setTimeout(startCycle, 3000);
             }
@@ -429,9 +509,11 @@
     }
 
     function addHistory(v) {
-        let h = document.getElementById('history-signals');
-        let cls = v >= 2 ? 'hist-high' : '';
-        h.innerHTML = `<div class="hist-item ${cls}">${v}x</div>` + h.innerHTML;
+        gameHistory.unshift(v); if(gameHistory.length > 20) gameHistory.pop();
+        renderSavedHistory(); saveData();
+    }
+    function renderSavedHistory() {
+        document.getElementById('history-signals').innerHTML = gameHistory.map(v => `<div class="hist-item ${v>=2?'hist-high':''}">${v}x</div>`).join('');
     }
 
     function handleBet(p) {
@@ -441,37 +523,26 @@
             else { balance += bets[p].amt; bets[p].active = false; }
         } else {
             if(bets[p].active) doCash(p);
-            else if(!bets[p].waiting) { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].waiting = true; } }
+            else { if(balance >= v) { balance -= v; bets[p].amt = v; bets[p].waiting = true; } }
         }
         refreshBtn(p); refreshUI();
     }
 
     function doCash(p) {
-        if(!bets[p].active) return;
-        balance += (bets[p].amt * multiplier);
-        bets[p].active = false;
+        balance += (bets[p].amt * multiplier); bets[p].active = false;
         refreshBtn(p); refreshUI();
     }
 
     function refreshBtn(p) {
-        let b = document.getElementById('btn'+p);
-        let v = document.getElementById('amt'+p).value;
+        let b = document.getElementById('btn'+p); let v = document.getElementById('amt'+p).value;
         if(bets[p].waiting) { b.className="btn-main waiting-mode"; b.innerHTML="WAITING..."; }
-        else if(bets[p].active && !isFlying) { b.className="btn-main waiting-mode"; b.innerHTML="CANCEL"; }
-        else if(!bets[p].active) { b.className="btn-main"; b.innerHTML=`BET <span>${v} BDT</span>`; }
+        else { b.className=bets[p].active?"btn-main waiting-mode":"btn-main"; b.innerHTML=bets[p].active?"CANCEL":`BET <span>${v} BDT</span>`; }
     }
 
-    function chAmt(p, v) { 
-        let i = document.getElementById('amt'+p);
-        i.value = Math.max(1, parseFloat(i.value) + v).toFixed(2);
-        refreshBtn(p);
-    }
-
-    function setFixedAmt(p, v) {
-        if(bets[p].active || bets[p].waiting) return; 
-        document.getElementById('amt'+p).value = v.toFixed(2);
-        refreshBtn(p);
-    }
+    function chAmt(p, v) { let i = document.getElementById('amt'+p); i.value = Math.max(1, parseFloat(i.value) + v).toFixed(2); refreshBtn(p); }
+    function setFixedAmt(p, v) { document.getElementById('amt'+p).value = v.toFixed(2); refreshBtn(p); }
+    function setTab(p, m) { document.getElementById('auto'+p).classList.toggle('active', m==='auto'); }
+    function clearAllData() { localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
