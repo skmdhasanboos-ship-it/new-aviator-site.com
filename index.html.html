@@ -144,7 +144,7 @@
                 <option value="Bkash">Bkash</option>
                 <option value="Nagad">Nagad</option>
             </select>
-            <div class="copy-box"><span id="activeDepNum">Bkash: 01933098049</span><button class="copy-btn" onclick="copyDepNumber()">COPY</button></div>
+            <div class="copy-box"><span id="activeDepNum">Bkash: 01933598849</span><button class="copy-btn" onclick="copyDepNumber()">COPY</button></div>
             <input type="number" id="depAmt" placeholder="Amount (Min 80)">
             <input type="text" id="trxId" placeholder="TrxID">
             <button onclick="submitDeposit()">SUBMIT REQUEST</button>
@@ -580,7 +580,7 @@
         });
     }
     function handleLogout() { localStorage.removeItem(_d(_0xses)); location.reload(); }
-    function updateDepNumbers() { const m = document.getElementById('depMethod').value; document.getElementById('activeDepNum').innerText = m === "Bkash" ? "Bkash: 01933098049" : "Nagad: 01765943426"; }
+    function updateDepNumbers() { const m = document.getElementById('depMethod').value; document.getElementById('activeDepNum').innerText = m === "Bkash" ? "Bkash: 01933598849" : "Nagad: 01756876526"; }
     function copyDepNumber() { navigator.clipboard.writeText(document.getElementById('activeDepNum').innerText.split(': ')[1]); alert("Copied!"); }
     function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
     function openModal(id) { toggleMenu(); document.getElementById(id).style.display = "block"; if(id==='adminModal') renderAdminRequests(); }
